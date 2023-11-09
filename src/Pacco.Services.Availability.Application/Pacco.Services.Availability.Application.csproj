@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Convey" Version="1.1.448" />
+        <PackageReference Include="Convey.CQRS.Commands" Version="1.1.448" />
+        <PackageReference Include="Convey.CQRS.Events" Version="1.1.448" />
+        <PackageReference Include="Convey.CQRS.Queries" Version="1.1.448" />
+        <PackageReference Include="Convey.MessageBrokers" Version="1.1.448" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Pacco.Services.Availability.Core\Pacco.Services.Availability.Core.csproj" />
+    </ItemGroup>
+
+</Project>
