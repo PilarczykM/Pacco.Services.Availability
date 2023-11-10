@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using Pacco.Services.Availability.Infrastructure;
+
 namespace Pacco.Services.Availability.Api
 {
     public class Startup
@@ -34,6 +36,8 @@ namespace Pacco.Services.Availability.Api
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseInfrastructure();
 
             app.UseEndpoints(endpoints =>
             {
