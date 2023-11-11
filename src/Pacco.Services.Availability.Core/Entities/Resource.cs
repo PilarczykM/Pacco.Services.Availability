@@ -54,4 +54,29 @@ public class Resource : AggregateRoot
 
         return resource;
     }
+
+    public void AddReservation(Reservation reservation)
+    {
+        var hasCollidingReservation = _reservations.Any(HasTheSameReservationDate);
+        if (hasCollidingReservation)
+        {
+            var collidingReservation = _reservations.First(HasTheSameReservationDate);
+            if (collidingReservation.Priority >= reservation.Priority)
+            {
+                throw new CannotExpropriateReservationException(Id, reservation.DateTime);
+            }
+
+            if (_reservations.Remove(collidingReservation))
+            {
+                AddEvent(new ReservationCanceled(this, collidingReservation));
+            }
+        }
+
+        if (_reservations.Add(reservation))
+        {
+            AddEvent(new ReservationAdded(this, reservation));
+        }
+
+        bool HasTheSameReservationDate(Reservation r) => r.DateTime.Date == reservation.DateTime.Date;
+    }
 }

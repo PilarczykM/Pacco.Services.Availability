@@ -56,4 +56,12 @@ public class ResourcesController : ControllerBase
 
         return Created($"resources/{command.ResourceId}", null);
     }
+
+    [HttpPost("{resourceId:guid}/reservations/{dataTime}")]
+    public async Task<ActionResult> ReserveResource([FromBody] ReserveResource command)
+    {
+        await _commandDispatcher.SendAsync(command);
+
+        return Created($"resources/{command.ResourceId}", null);
+    }
 }
