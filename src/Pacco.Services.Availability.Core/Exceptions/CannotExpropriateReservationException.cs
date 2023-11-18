@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Pacco.Services.Availability.Core.Exceptions;
-internal class CannotExpropriateReservationException : DomainException
+public class CannotExpropriateReservationException : DomainException
 {
     public CannotExpropriateReservationException(Guid resourceId, DateTime dateTime) : base($"Cannot expropriate resource: {resourceId} reservation at: {dateTime}")
     {

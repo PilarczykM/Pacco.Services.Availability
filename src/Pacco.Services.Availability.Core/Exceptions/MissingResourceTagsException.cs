@@ -1,5 +1,5 @@
 ﻿namespace Pacco.Services.Availability.Core.Exceptions;
-internal class MissingResourceTagsException : DomainException
+public class MissingResourceTagsException : DomainException
 {
     public MissingResourceTagsException() : base("Resource tags are missing.")
     { }
