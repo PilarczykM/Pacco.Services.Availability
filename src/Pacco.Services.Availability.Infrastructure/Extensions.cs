@@ -2,12 +2,15 @@
 
 using Convey;
 using Convey.CQRS.Queries;
+using Convey.MessageBrokers.CQRS;
+using Convey.MessageBrokers.RabbitMQ;
 using Convey.Persistence.MongoDB;
 using Convey.WebApi;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
+using Pacco.Services.Availability.Application.Events.External;
 using Pacco.Services.Availability.Core.Repositories;
 using Pacco.Services.Availability.Infrastructure.Exceptions;
 using Pacco.Services.Availability.Infrastructure.Mongo.Documents;
@@ -25,6 +28,7 @@ public static class Extensions
         builder.AddErrorHandler<ExceptionToResponseMapper>();
         builder.AddMongo()
             .AddMongoRepository<ResourceDocument, Guid>("resources");
+        builder.AddRabbitMq();
 
         return builder;
     }
@@ -33,7 +37,9 @@ public static class Extensions
     {
         app
             .UseErrorHandler()
-            .UseConvey();
+            .UseConvey()
+            .UseRabbitMq()
+                .SubscribeEvent<SignedUp>();
 
         return app;
     }
