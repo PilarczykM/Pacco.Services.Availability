@@ -2,19 +2,26 @@
 
 using Convey;
 using Convey.CQRS.Queries;
+using Convey.Docs.Swagger;
 using Convey.MessageBrokers.CQRS;
 using Convey.MessageBrokers.RabbitMQ;
 using Convey.Persistence.MongoDB;
 using Convey.WebApi;
+using Convey.WebApi.CQRS;
+using Convey.WebApi.Swagger;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
+using Pacco.Services.Availability.Application;
+using Pacco.Services.Availability.Application.Events;
 using Pacco.Services.Availability.Application.Events.External;
+using Pacco.Services.Availability.Application.Services;
 using Pacco.Services.Availability.Core.Repositories;
 using Pacco.Services.Availability.Infrastructure.Exceptions;
 using Pacco.Services.Availability.Infrastructure.Mongo.Documents;
 using Pacco.Services.Availability.Infrastructure.Mongo.Repositories;
+using Pacco.Services.Availability.Infrastructure.Services;
 
 namespace Pacco.Services.Availability.Infrastructure;
 
@@ -23,12 +30,24 @@ public static class Extensions
     public static IConveyBuilder AddInfrastructure(this IConveyBuilder builder)
     {
         builder.Services.AddTransient<IResourceRepository, ResourcesMongoRepository>();
-        builder.AddQueryHandlers();
-        builder.AddInMemoryQueryDispatcher();
-        builder.AddErrorHandler<ExceptionToResponseMapper>();
-        builder.AddMongo()
-            .AddMongoRepository<ResourceDocument, Guid>("resources");
-        builder.AddRabbitMq();
+        builder.Services.AddTransient<IMessageBroker, MessageBroker>();
+        builder.Services.AddTransient<IEventProcessor, EventProcessor>();
+        builder.Services.AddSingleton<IEventMapper, EventMapper>();
+
+        builder.Services.Scan(s => s.FromAssemblies(AppDomain.CurrentDomain.GetAssemblies())
+            .AddClasses(c => c.AssignableTo(typeof(IDomainEventHandler<>)))
+            .AsImplementedInterfaces()
+            .WithTransientLifetime());
+
+        builder.AddQueryHandlers()
+            .AddInMemoryQueryDispatcher()
+            .AddErrorHandler<ExceptionToResponseMapper>()
+            .AddExceptionToMessageMapper<ExceptionToMessageMapper>()
+            .AddMongo()
+            .AddMongoRepository<ResourceDocument, Guid>("resources")
+            .AddRabbitMq()
+            .AddSwaggerDocs()
+            .AddWebApiSwaggerDocs();
 
         return builder;
     }
@@ -38,6 +57,8 @@ public static class Extensions
         app
             .UseErrorHandler()
             .UseConvey()
+            .UsePublicContracts<ContractAttribute>()
+            .UseSwaggerDocs()
             .UseRabbitMq()
                 .SubscribeEvent<SignedUp>();
 
