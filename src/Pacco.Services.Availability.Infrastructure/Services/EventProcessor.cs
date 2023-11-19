@@ -46,7 +46,6 @@ internal class EventProcessor : IEventProcessor
     {
         var integrationEvents = new List<IEvent>();
         using var scope = _serviceScopeFactory.CreateScope();
-
         foreach (var domainEvent in domainEvents)
         {
             var domainEventType = domainEvent.GetType();
@@ -60,7 +59,7 @@ internal class EventProcessor : IEventProcessor
             }
 
             var integationEvent = _eventMapper.Map(domainEvent);
-            if (integationEvent != null)
+            if (integationEvent is null)
             {
                 continue;
             }

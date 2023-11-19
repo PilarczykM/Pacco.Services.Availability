@@ -12,7 +12,7 @@ using Pacco.Services.Availability.Application.Queries;
 
 namespace Pacco.Services.Availability.Api.Controllers;
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class ResourcesController : ControllerBase
 {
     private readonly ICommandDispatcher _commandDispatcher;
